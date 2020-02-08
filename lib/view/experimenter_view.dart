@@ -42,8 +42,8 @@ class ExperimenterView extends StatelessWidget {
                 }
 
                 return Text(
-                  ExperimentData.fromSnapshot(snapshot.data)
-                      .participantCount
+                  "Participants Complete: " + ExperimentData.fromSnapshot(snapshot.data)
+                      .participantsComplete
                       .toString(),
                   style: theme.textTheme.subhead,
                 );

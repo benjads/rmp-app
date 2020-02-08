@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:rmp_app/model/experiment.dart';
@@ -23,54 +25,107 @@ class RMPApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: getLaunchPage(),
+      home: getLaunchPage(context),
     );
   }
 
-  Widget getLaunchPage() {
+  Widget getLaunchPage(BuildContext context) {
     if (EXPERIMENTER_INSTALL) return ExperimenterView();
 
-    return StreamBuilder<Participant>(
-        stream: _participant == null
-            ? ParticipantRepo.addParticipant().asStream()
-            : Future.value(_participant).asStream(),
-        builder: (context, participantSnapshot) {
-          if (!participantSnapshot.hasData) return CircularProgressIndicator();
+    return LaunchView();
+  }
+}
 
-          _participant = participantSnapshot.data;
+class LaunchView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    loadData().then((experimentSnapshot) => Navigator.of(context)
+        .pushReplacement(new MaterialPageRoute(
+            builder: (context) => ParticipantApp(experimentSnapshot))));
 
-          return StreamBuilder<DocumentSnapshot>(
-            stream: ExperimentRepo.getExperimentStream(),
-            builder: (context, experimentSnapshot) {
-              if (!experimentSnapshot.hasData)
-                return CircularProgressIndicator();
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(child: FlutterLogo()),
+    );
+  }
 
-              if (experimentSnapshot.data.data == null) {
-                ExperimentRepo.createExperiment();
-                return CircularProgressIndicator();
-              }
+  Future<DocumentSnapshot> loadData() async {
+    final Participant participant = await ParticipantRepo.addParticipant();
 
-              final Experiment experiment =
-                  Experiment.fromSnapshot(experimentSnapshot.data);
-              switch (experiment.state) {
-                case ExperimentState.TRAIN:
-                  return StimulusView(Stimulus.stimuli, reportComplete);
-                  break;
-                case ExperimentState.DISTRACT:
-                  return TestView();
-                  break;
-                case ExperimentState.TEST:
-                  return TestView();
-                  break;
-                case ExperimentState.WAIT:
-                  return TestView();
-                  break;
-                default:
-                  return TestView();
-              }
-            },
-          );
+    _participant = participant;
+
+    final DocumentSnapshot experimentDoc = await ExperimentRepo.getExperiment();
+
+    if (experimentDoc.data == null)
+      return await ExperimentRepo.createExperiment();
+    else
+      return experimentDoc;
+  }
+}
+
+class ParticipantApp extends StatefulWidget {
+  final DocumentSnapshot experimentDoc;
+
+  ParticipantApp(this.experimentDoc);
+
+  @override
+  State<StatefulWidget> createState() => _ParticipantAppState(experimentDoc);
+}
+
+class _ParticipantAppState extends State<ParticipantApp> {
+  final DocumentSnapshot experimentDoc;
+
+  ExperimentState _state;
+  StreamSubscription _experimentSub;
+
+  _ParticipantAppState(this.experimentDoc);
+
+  @override
+  void initState() {
+    super.initState();
+
+    _state = Experiment.fromSnapshot(experimentDoc).state;
+
+    _experimentSub = ExperimentRepo.getExperimentStream().listen((snapshot) {
+      final Experiment experiment = Experiment.fromSnapshot(snapshot);
+
+      if (experiment.state == ExperimentState.RESET) {
+        _participant = null;
+        Navigator.of(context).pushReplacement(
+            new MaterialPageRoute(builder: (context) => LaunchView()));
+      } else {
+        setState(() {
+          _state = experiment.state;
         });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _experimentSub.cancel();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    switch (_state) {
+      case ExperimentState.TRAIN:
+        return StimulusView(_participant, Stimulus.stimuli, reportComplete);
+        break;
+      case ExperimentState.DISTRACT:
+        return TestView();
+        break;
+      case ExperimentState.TEST:
+        return TestView();
+        break;
+      case ExperimentState.WAIT:
+        return TestView();
+        break;
+      default:
+        return TestView();
+    }
   }
 
   void reportComplete() {}

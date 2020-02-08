@@ -4,23 +4,30 @@ class Experiment {
   static const String STATE = "state";
 
   ExperimentState state;
-  final DocumentReference reference;
+  DocumentReference reference;
 
-  Experiment(this.reference);
+  Experiment._internal()
+  : state = ExperimentState.WAIT;
 
   Experiment.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);
 
   Experiment.fromMap(Map<String, dynamic> map, {this.reference})
       : assert(map[STATE] != null),
-        state = ExperimentState.values.firstWhere(
-            (state) => (state.toString() == "ExperimentState.${map[STATE]}"));
+        state = ExperimentState.values
+            .firstWhere((state) => (state.toString() == map[STATE]));
 
   Map<String, dynamic> get map {
-    return {STATE: state};
+    return {STATE: state.toString()};
   }
 
-  static const Map<String, dynamic> defaultMap = {STATE: "WAIT"};
+  static final Map<String, dynamic> defaultMap = {
+    STATE: ExperimentState.WAIT.toString()
+  };
+
+  factory Experiment.initialize() {
+    return Experiment._internal();
+  }
 }
 
-enum ExperimentState { WAIT, TRAIN, DISTRACT, TEST }
+enum ExperimentState { WAIT, TRAIN, DISTRACT, TEST, RESET }

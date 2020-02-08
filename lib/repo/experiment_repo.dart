@@ -9,9 +9,14 @@ class ExperimentRepo {
     return _firestore.document(FirestorePaths.experimentDocPath).snapshots();
   }
 
-  static void createExperiment() {
+  static Future<DocumentSnapshot> getExperiment() {
+    return _firestore.document(FirestorePaths.experimentDocPath).get();
+  }
+
+  static Future<DocumentSnapshot> createExperiment() async {
     final DocumentReference docRef =
         _firestore.document(FirestorePaths.experimentDocPath);
-    docRef.setData(Experiment.defaultMap);
+    await docRef.setData(Experiment.defaultMap);
+    return docRef.get(source: Source.cache);
   }
 }

@@ -1,22 +1,24 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:rmp_app/model/participant.dart';
 import 'package:rmp_app/model/stimulus.dart';
 
 const Duration STIMULUS_DISPLAY_TIME = const Duration(seconds: 3);
 
 class StimulusView extends StatelessWidget {
 
+  final Participant _participant;
   final List<Stimulus> _stimuli;
   final VoidCallback _onComplete;
 
-  StimulusView(this._stimuli, this._onComplete);
+  StimulusView(this._participant, this._stimuli, this._onComplete);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: StimulusData(_stimuli, _onComplete),
+        child: StimulusData(_participant, _stimuli, _onComplete),
       ),
     );
   }
@@ -24,24 +26,26 @@ class StimulusView extends StatelessWidget {
 
 class StimulusData extends StatefulWidget {
 
+  final Participant _participant;
   final List<Stimulus> _stimuli;
   final VoidCallback _onComplete;
 
-  StimulusData(this._stimuli, this._onComplete);
+  StimulusData(this._participant, this._stimuli, this._onComplete);
 
   @override
-  State<StatefulWidget> createState() => _StimulusDataState(_stimuli, _onComplete);
+  State<StatefulWidget> createState() => _StimulusDataState(_participant, _stimuli, _onComplete);
 }
 
 class _StimulusDataState extends State<StimulusData> {
 
+  final Participant _participant;
   final List<Stimulus> _stimuli;
   final VoidCallback _onComplete;
   num _index = 0;
   Stimulus _stimulus;
 
 
-  _StimulusDataState(this._stimuli, this._onComplete);
+  _StimulusDataState(this._participant, this._stimuli, this._onComplete);
 
   @override
   void initState() {
