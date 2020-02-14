@@ -10,7 +10,7 @@ class StimulusView extends StatelessWidget {
 
   final Participant _participant;
   final List<Stimulus> _stimuli;
-  final VoidCallback _onComplete;
+  final Function _onComplete;
 
   StimulusView(this._participant, this._stimuli, this._onComplete);
 
@@ -28,7 +28,7 @@ class StimulusData extends StatefulWidget {
 
   final Participant _participant;
   final List<Stimulus> _stimuli;
-  final VoidCallback _onComplete;
+  final Function _onComplete;
 
   StimulusData(this._participant, this._stimuli, this._onComplete);
 
@@ -40,7 +40,7 @@ class _StimulusDataState extends State<StimulusData> {
 
   final Participant _participant;
   final List<Stimulus> _stimuli;
-  final VoidCallback _onComplete;
+  final Function _onComplete;
   num _index = 0;
   Stimulus _stimulus;
 
@@ -60,7 +60,7 @@ class _StimulusDataState extends State<StimulusData> {
     setState(() {
       _index++;
       if (_index >= (_stimuli.length - 1)) {
-        _onComplete();
+        _onComplete(_participant);
         _index = -1;
         return;
       }

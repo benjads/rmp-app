@@ -2,12 +2,15 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:rmp_app/model/experiment.dart';
 import 'package:rmp_app/model/participant.dart';
 import 'package:rmp_app/repo/experiment_repo.dart';
 import 'package:rmp_app/repo/participant_repo.dart';
 import 'package:rmp_app/view/experimenter_view.dart';
 import 'package:rmp_app/view/stimulus_view.dart';
+import 'package:rmp_app/view/survey_view.dart';
+import 'package:rmp_app/view/wait_view.dart';
 
 import 'model/stimulus.dart';
 
@@ -20,6 +23,10 @@ void main() => runApp(RMPApp());
 class RMPApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+
     return MaterialApp(
       title: 'RMP Study',
       theme: ThemeData(
@@ -77,6 +84,7 @@ class _ParticipantAppState extends State<ParticipantApp> {
 
   ExperimentState _state;
   StreamSubscription _experimentSub;
+  bool stateLock = false;
 
   _ParticipantAppState(this.experimentDoc);
 
@@ -86,15 +94,20 @@ class _ParticipantAppState extends State<ParticipantApp> {
 
     _state = Experiment.fromSnapshot(experimentDoc).state;
 
+    if (_state == ExperimentState.RESET)
+      stateLock = true;
+
     _experimentSub = ExperimentRepo.getExperimentStream().listen((snapshot) {
       final Experiment experiment = Experiment.fromSnapshot(snapshot);
 
-      if (experiment.state == ExperimentState.RESET) {
+      if (experiment.state == ExperimentState.RESET && !stateLock) {
         _participant = null;
         Navigator.of(context).pushReplacement(
             new MaterialPageRoute(builder: (context) => LaunchView()));
       } else {
         setState(() {
+          stateLock = false;
+          _participant.stageComplete = false;
           _state = experiment.state;
         });
       }
@@ -111,6 +124,8 @@ class _ParticipantAppState extends State<ParticipantApp> {
   @override
   Widget build(BuildContext context) {
     switch (_state) {
+      case ExperimentState.SURVEY:
+        return SurveyView(_participant, reportComplete);
       case ExperimentState.TRAIN:
         return StimulusView(_participant, Stimulus.stimuli, reportComplete);
         break;
@@ -121,14 +136,16 @@ class _ParticipantAppState extends State<ParticipantApp> {
         return TestView();
         break;
       case ExperimentState.WAIT:
-        return TestView();
-        break;
       default:
-        return TestView();
+        return WaitView();
+        break;
     }
   }
 
-  void reportComplete() {}
+  void reportComplete(Participant participant) {
+    participant.stageComplete = true;
+    ParticipantRepo.updateParticipant(participant);
+  }
 }
 
 class TestView extends StatelessWidget {

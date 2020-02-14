@@ -30,4 +30,44 @@ class Experiment {
   }
 }
 
-enum ExperimentState { WAIT, TRAIN, DISTRACT, TEST, RESET }
+enum ExperimentState { WAIT, SURVEY, TRAIN, DISTRACT, TEST, RESET }
+
+extension StateExtension on ExperimentState {
+  ExperimentState get next {
+    switch (this) {
+      case ExperimentState.WAIT:
+       return ExperimentState.SURVEY;
+      case ExperimentState.SURVEY:
+        return ExperimentState.TRAIN;
+      case ExperimentState.TRAIN:
+        return ExperimentState.DISTRACT;
+      case ExperimentState.DISTRACT:
+        return ExperimentState.TEST;
+      case ExperimentState.TEST:
+        return ExperimentState.WAIT;
+      case ExperimentState.RESET:
+        return ExperimentState.WAIT;
+      default:
+        return null;
+    }
+  }
+
+  ExperimentState get previous {
+    switch (this) {
+      case ExperimentState.WAIT:
+        return ExperimentState.WAIT;
+      case ExperimentState.SURVEY:
+        return ExperimentState.WAIT;
+      case ExperimentState.TRAIN:
+        return ExperimentState.SURVEY;
+      case ExperimentState.DISTRACT:
+        return ExperimentState.TRAIN;
+      case ExperimentState.TEST:
+        return ExperimentState.DISTRACT;
+      case ExperimentState.RESET:
+        return ExperimentState.WAIT;
+      default:
+        return null;
+    }
+  }
+}

@@ -1,13 +1,14 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rmp_app/model/participant.dart';
 import 'package:rmp_app/repo/common.dart';
-import 'package:rmp_app/util/device_util.dart';
+import 'package:rmp_app/util.dart';
 
 class ParticipantRepo {
   static final Firestore _firestore = Firestore.instance;
 
   static Future<Participant> addParticipant() async {
-    final String deviceId = await DeviceUtil.getDeviceId();
+    final String deviceId = await RMPUtil.getDeviceId();
 
     final CollectionReference collectionRef =
         _firestore.collection(FirestorePaths.PARTICIPANTS_PATH);
@@ -40,5 +41,24 @@ class ParticipantRepo {
 
     participant.reference = docRef;
     return participant;
+  }
+
+  static Stream<QuerySnapshot> getParticipants() {
+    return _firestore.collection(FirestorePaths.PARTICIPANTS_PATH).snapshots();
+  }
+
+  static void clearParticipants(List<Participant> cached, WriteBatch batch) {
+    assert(cached != null);
+    assert(batch != null);
+
+    for (final Participant participant in cached) {
+      final DocumentReference doc  = participant.reference;
+      assert(doc != null);
+      batch.delete(doc);
+    }
+  }
+
+  static Future<void> updateParticipant(Participant participant) async {
+    await participant.reference.updateData(participant.map);
   }
 }
