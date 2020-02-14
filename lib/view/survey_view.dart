@@ -45,8 +45,7 @@ class _QuestionContainerState extends State<QuestionContainer> {
     super.initState();
 
     for (final SurveyQuestion question in SurveyQuestion.values)
-      if (_participant.survey[question.toString()] == null)
-        return;
+      if (_participant.survey[question.toString()] == null) return;
 
     _complete = true;
   }
@@ -56,8 +55,19 @@ class _QuestionContainerState extends State<QuestionContainer> {
     final ThemeData theme = Theme.of(context);
 
     if (_participant.stageComplete) {
-      return Text("Submitted. Please wait.",
-      style: theme.textTheme.headline,);
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            "Submitted",
+            style: theme.textTheme.headline,
+          ),
+          Text(
+            "Please wait...",
+            style: theme.textTheme.subhead,
+          )
+        ],
+      );
     }
 
     return Column(

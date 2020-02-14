@@ -10,6 +10,7 @@ import 'package:rmp_app/repo/participant_repo.dart';
 import 'package:rmp_app/view/experimenter_view.dart';
 import 'package:rmp_app/view/stimulus_view.dart';
 import 'package:rmp_app/view/survey_view.dart';
+import 'package:rmp_app/view/test_view.dart';
 import 'package:rmp_app/view/wait_view.dart';
 
 import 'model/stimulus.dart';
@@ -94,8 +95,7 @@ class _ParticipantAppState extends State<ParticipantApp> {
 
     _state = Experiment.fromSnapshot(experimentDoc).state;
 
-    if (_state == ExperimentState.RESET)
-      stateLock = true;
+    if (_state == ExperimentState.RESET) stateLock = true;
 
     _experimentSub = ExperimentRepo.getExperimentStream().listen((snapshot) {
       final Experiment experiment = Experiment.fromSnapshot(snapshot);
@@ -130,10 +130,11 @@ class _ParticipantAppState extends State<ParticipantApp> {
         return StimulusView(_participant, Stimulus.stimuli, reportComplete);
         break;
       case ExperimentState.DISTRACT:
-        return TestView();
+        return BlankView();
         break;
       case ExperimentState.TEST:
-        return TestView();
+        return TestView(_participant, Stimulus.stimuli, Stimulus.fakeStimuli,
+            reportComplete);
         break;
       case ExperimentState.WAIT:
       default:
@@ -148,14 +149,14 @@ class _ParticipantAppState extends State<ParticipantApp> {
   }
 }
 
-class TestView extends StatelessWidget {
+class BlankView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[Text("Test")],
+          children: <Widget>[Text("Blank")],
         ),
       ),
     );

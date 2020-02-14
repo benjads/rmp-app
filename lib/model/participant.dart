@@ -5,18 +5,20 @@ class Participant {
   static const String DEVICE_ID = "device_id";
   static const String STAGE_COMPLETE = "stage_complete";
   static const String PERCENT_CORRECT = "percent_correct";
+  static const String SUBMIT_TIME = "submit_time";
   static const String CONDITION = "condition";
   static const String SURVEY = "survey";
 
   final String deviceId;
   bool stageComplete;
-  final double percentCorrect;
+  double percentCorrect;
+  num submitTime;
   final Condition condition;
-  Map<String, dynamic> survey;
+  final Map<String, dynamic> survey;
   DocumentReference reference;
 
   Participant._internal(this.deviceId, this.stageComplete, this.percentCorrect,
-      this.condition, this.survey);
+      this.submitTime, this.condition, this.survey);
 
   Participant.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);
@@ -25,17 +27,19 @@ class Participant {
       : assert(map[DEVICE_ID] != null),
         assert(map[STAGE_COMPLETE] != null),
         assert(map[PERCENT_CORRECT] != null),
+        assert(map[SUBMIT_TIME] != null),
         assert(map[CONDITION] != null),
         assert(map[SURVEY] != null),
         deviceId = map[DEVICE_ID],
         stageComplete = map[STAGE_COMPLETE],
         percentCorrect = map[PERCENT_CORRECT],
+        submitTime = map[SUBMIT_TIME],
         condition = Condition.values
             .firstWhere((state) => (state.toString() == map[CONDITION])),
         survey = RMPUtil.toMap(map[SURVEY]);
 
   factory Participant.initialize(String deviceId, Condition condition) {
-    return Participant._internal(deviceId, false, -1.0, condition, {});
+    return Participant._internal(deviceId, false, -1.0, -1, condition, {});
   }
 
   Map<String, dynamic> get map {
@@ -43,6 +47,7 @@ class Participant {
       DEVICE_ID: deviceId,
       STAGE_COMPLETE: stageComplete,
       PERCENT_CORRECT: percentCorrect,
+      SUBMIT_TIME: submitTime,
       CONDITION: condition.toString(),
       SURVEY: survey
     };
