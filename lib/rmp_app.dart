@@ -15,13 +15,13 @@ import 'package:rmp_app/view/wait_view.dart';
 
 import 'model/stimulus.dart';
 
-const bool EXPERIMENTER_INSTALL = false;
-
 Participant _participant;
 
-void main() => runApp(RMPApp());
-
 class RMPApp extends StatelessWidget {
+  final bool experimenterApp;
+
+  RMPApp(this.experimenterApp);
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
@@ -29,7 +29,7 @@ class RMPApp extends StatelessWidget {
     ]);
 
     return MaterialApp(
-      title: 'RMP Study',
+      title: experimenterApp ? 'Latinmem (Experimenter)' : 'Latinmem',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -38,7 +38,7 @@ class RMPApp extends StatelessWidget {
   }
 
   Widget getLaunchPage(BuildContext context) {
-    if (EXPERIMENTER_INSTALL) return ExperimenterView();
+    if (experimenterApp) return ExperimenterView();
 
     return LaunchView();
   }
@@ -53,7 +53,12 @@ class LaunchView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(child: FlutterLogo()),
+      body: Center(
+        child: Image(
+          image: AssetImage("graphics/latinmem_logo.png"),
+          height: 180.0,
+        ),
+      ),
     );
   }
 
