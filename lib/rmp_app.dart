@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:rmp_app/game/game.dart';
 import 'package:rmp_app/model/experiment.dart';
 import 'package:rmp_app/model/participant.dart';
 import 'package:rmp_app/repo/experiment_repo.dart';
 import 'package:rmp_app/repo/participant_repo.dart';
+import 'package:rmp_app/view/distract_view.dart';
 import 'package:rmp_app/view/experimenter_view.dart';
 import 'package:rmp_app/view/stimulus_view.dart';
 import 'package:rmp_app/view/survey_view.dart';
@@ -16,6 +18,7 @@ import 'package:rmp_app/view/wait_view.dart';
 import 'model/stimulus.dart';
 
 Participant _participant;
+BoxGame _game;
 
 class RMPApp extends StatelessWidget {
   final bool experimenterApp;
@@ -63,6 +66,9 @@ class LaunchView extends StatelessWidget {
   }
 
   Future<DocumentSnapshot> loadData() async {
+    await BoxGame.preload();
+    _game = BoxGame();
+    
     final Participant participant = await ParticipantRepo.addParticipant();
 
     _participant = participant;
@@ -135,7 +141,7 @@ class _ParticipantAppState extends State<ParticipantApp> {
         return StimulusView(_participant, Stimulus.stimuli, reportComplete);
         break;
       case ExperimentState.DISTRACT:
-        return BlankView();
+        return DistractView(_game);
         break;
       case ExperimentState.TEST:
         return TestView(_participant, Stimulus.stimuli, Stimulus.fakeStimuli,
@@ -151,19 +157,5 @@ class _ParticipantAppState extends State<ParticipantApp> {
   void reportComplete(Participant participant) {
     participant.stageComplete = true;
     ParticipantRepo.updateParticipant(participant);
-  }
-}
-
-class BlankView extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[Text("Blank")],
-        ),
-      ),
-    );
   }
 }
