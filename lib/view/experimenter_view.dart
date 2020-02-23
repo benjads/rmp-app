@@ -6,7 +6,6 @@ import 'package:rmp_app/rmp_app.dart';
 import 'package:rmp_app/util.dart';
 
 class ExperimenterView extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -41,8 +40,7 @@ class ExperimenterView extends StatelessWidget {
                       return CircularProgressIndicator();
 
                     final List<Participant> participants = [];
-                    participantsSnapshot.data
-                        .forEach((participantDoc) {
+                    participantsSnapshot.data.forEach((participantDoc) {
                       participants
                           .add(Participant.fromSnapshot(participantDoc));
                     });
@@ -60,7 +58,8 @@ class ExperimenterView extends StatelessWidget {
                             Icons.extension,
                             "Phase",
                             Text(
-                              RMPUtil.formatEnum(experiment.state),
+                              RMPUtil.formatEnum(
+                                  "ExperimentState", experiment.state),
                             ),
                           ),
                           experiment.state == ExperimentState.RESET
@@ -74,8 +73,10 @@ class ExperimenterView extends StatelessWidget {
                                       color: theme.colorScheme.error,
                                     ),
                                     RaisedButton(
-                                      onPressed: () => _changeState(experiment,
-                                          experiment.state.previous, participants),
+                                      onPressed: () => _changeState(
+                                          experiment,
+                                          experiment.state.previous,
+                                          participants),
                                       child: Text("Previous Phase"),
                                       color: theme.accentColor,
                                     ),
@@ -114,14 +115,18 @@ class ExperimenterView extends StatelessWidget {
 
     final List<Widget> conditionsWidgets = [];
     for (Condition condition in conditions.keys) {
-      final String name = RMPUtil.formatEnum(condition);
+      final String name = RMPUtil.formatEnum("Condition", condition);
       conditionsWidgets.add(Text("$name - ${conditions[condition]}"));
     }
 
     return [
       _buildDataRow(Icons.person, "Participants", Text(count.toString())),
-      _buildDataRow(Icons.done, "Participants Complete",
-          count == 0 ? Text("N/A") : Text("$complete (${RMPUtil.percent(complete, count)})")),
+      _buildDataRow(
+          Icons.done,
+          "Participants Complete",
+          count == 0
+              ? Text("N/A")
+              : Text("$complete (${RMPUtil.percent(complete, count)})")),
       _buildDataRow(
         Icons.call_split,
         "Conditions",

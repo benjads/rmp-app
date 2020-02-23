@@ -66,6 +66,9 @@
 # Firebase
 **/google-services.json
 **/GoogleService-Info.plist
+.firebaserc
+firebase.json
+.firebase/
 
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3

@@ -29,11 +29,8 @@ class WaitView extends StatelessWidget {
                 style: theme.textTheme.subtitle1,
               ),
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: Divider(
-                  indent: 50.0,
-                  endIndent: 50.0,
-                ),
+                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 40.0),
+                child: Divider(),
               ),
               Text(
                 "Please wait for other participants",

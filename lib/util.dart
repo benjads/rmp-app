@@ -28,8 +28,7 @@ class RMPUtil {
     return null;
   }
 
-  static String formatEnum(dynamic enumConstant) {
-    final enumName = enumConstant.runtimeType.toString();
+  static String formatEnum(String enumName, dynamic enumConstant) {
     final constantName = enumConstant.toString().substring(enumName.length + 1);
     return "${constantName[0]}${constantName.substring(1).toLowerCase()}";
   }
