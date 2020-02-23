@@ -10,10 +10,11 @@ class SurveyView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 5.0),
+            padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
             child: QuestionContainer(_participant, _onComplete),
           ),
         ),
@@ -60,27 +61,29 @@ class _QuestionContainerState extends State<QuestionContainer> {
         children: <Widget>[
           Text(
             "Submitted",
-            style: theme.textTheme.headline,
+            style: theme.textTheme.headline5,
           ),
           Text(
             "Please wait...",
-            style: theme.textTheme.subhead,
+            style: theme.textTheme.subtitle1,
           )
         ],
       );
     }
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return ListView(
       children: <Widget>[
         Text(
           "Please answer the following questions",
-          style: theme.textTheme.title,
+          style: theme.textTheme.headline6,
+          textAlign: TextAlign.center,
         ),
         Text(
           "Tap \"Done\" when complete",
-          style: theme.textTheme.subtitle,
+          style: theme.textTheme.subtitle2,
+          textAlign: TextAlign.center,
         ),
+        SizedBox(height: 10.0),
         for (final SurveyQuestion question in SurveyQuestion.values)
           QuestionWidget(question, _participant, () {
             checkCompletion();
@@ -99,6 +102,36 @@ class _QuestionContainerState extends State<QuestionContainer> {
         ),
       ],
     );
+//    return Column(
+//      mainAxisAlignment: MainAxisAlignment.center,
+//      mainAxisSize: MainAxisSize.min,
+//      children: <Widget>[
+//        Text(
+//          "Please answer the following questions",
+//          style: theme.textTheme.title,
+//        ),
+//        Text(
+//          "Tap \"Done\" when complete",
+//          style: theme.textTheme.subtitle,
+//        ),
+//        for (final SurveyQuestion question in SurveyQuestion.values)
+//          QuestionWidget(question, _participant, () {
+//            checkCompletion();
+//          }),
+//        ButtonBar(
+//          children: <Widget>[
+//            RaisedButton(
+//              onPressed: _complete
+//                  ? () => setState(() => _onComplete(_participant))
+//                  : null,
+//              child: Text("Done"),
+//              color: theme.accentColor,
+//              disabledColor: theme.disabledColor,
+//            ),
+//          ],
+//        ),
+//      ],
+//    );
   }
 
   void checkCompletion() {
@@ -150,26 +183,33 @@ class _QuestionWidgetState extends State<QuestionWidget> {
               padding: EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
                 _question.questionText,
-                style: theme.textTheme.subtitle,
+                style: theme.textTheme.subtitle2,
+                textAlign: TextAlign.center,
               ),
             ),
             for (final String choice in _question.radioOptions)
-              ListTile(
-                title: Text(choice),
-                leading: Radio(
-                  value: choice,
-                  groupValue: _participant.survey[_question.toString()],
-                  onChanged: (chosen) {
-                    setState(() {
-                      _participant.survey[_question.toString()] = chosen;
-                      _callback();
-                    });
-                  },
+              GestureDetector(
+                onTap: () => setChosen(choice),
+                child: ListTile(
+                  title: Text(choice),
+                  leading: Radio(
+                    value: choice,
+                    groupValue: _participant.survey[_question.toString()],
+                    onChanged: (chosen) => setChosen(choice),
+                  ),
                 ),
-              )
+              ),
+
           ],
         ),
       ),
     );
+  }
+
+  void setChosen(String choice) {
+    setState(() {
+      _participant.survey[_question.toString()] = choice;
+      _callback();
+    });
   }
 }

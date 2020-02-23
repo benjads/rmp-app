@@ -40,9 +40,11 @@ class BoxGame extends BaseGame {
     });
 
     final String pointsText = points.toString();
-    regularText.render(canvas, "Score: $pointsText", Position(20.0, dimensions.height - 10.0), anchor: Anchor.bottomLeft);
+    regularText.render(canvas, "Score: $pointsText", Position(5.0, 5.0), anchor: Anchor.topLeft);
     canvas.restore();
     canvas.save();
+
+    canvas.restore();
   }
 
   @override
@@ -73,8 +75,8 @@ class BoxGame extends BaseGame {
   void onTapDown(TapDownDetails details) {
     crates.removeWhere((crate) {
       final double diff = CRATE_SIZE / 2;
-      final double dX = ((crate.x + diff) - details.globalPosition.dx).abs();
-      final double dY = ((crate.y + diff) - details.globalPosition.dy).abs();
+      final double dX = ((crate.x + diff) - details.localPosition.dx).abs();
+      final double dY = ((crate.y + diff) - details.localPosition.dy).abs();
 
       final bool remove = (dX < diff && dY < diff);
       if (remove) {
@@ -85,7 +87,6 @@ class BoxGame extends BaseGame {
       return remove;
     });
   }
-
 
   @override
   void onDetach() {

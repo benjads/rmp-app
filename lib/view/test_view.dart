@@ -18,6 +18,7 @@ class TestView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: SafeArea(
         child: Center(
           child: WordList(_participant, _stimuli, _fakeStimuli, _onComplete),
@@ -95,7 +96,7 @@ class _WordListState extends State<WordList> {
         children: <Widget>[
           Text(
             "Study Completed",
-            style: theme.textTheme.headline,
+            style: theme.textTheme.headline5,
           ),
           SizedBox(
             height: 10.0,
@@ -103,7 +104,7 @@ class _WordListState extends State<WordList> {
           Text(
             "Thank you for participating!"
             " Please wait quietely while others finish",
-            style: theme.textTheme.subhead,
+            style: theme.textTheme.subtitle1,
             textAlign: TextAlign.center,
           )
         ],
@@ -116,7 +117,7 @@ class _WordListState extends State<WordList> {
         children: <Widget>[
           Text(
             "Instructions:",
-            style: theme.textTheme.display2,
+            style: theme.textTheme.headline3,
           ),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 12.0),
@@ -124,7 +125,7 @@ class _WordListState extends State<WordList> {
               "You will be shown several words once you click \"Start\"." +
                   " Do your best to check the ones saw ealier."
                       " This section is timed.",
-              style: theme.textTheme.headline,
+              style: theme.textTheme.headline5,
               textAlign: TextAlign.center,
             ),
           ),
@@ -168,12 +169,14 @@ class _WordListState extends State<WordList> {
           padding: EdgeInsets.symmetric(vertical: 10.0),
           child: Text(
             "Check which Latin names you saw earlier",
-            style: theme.textTheme.title,
+            style: theme.textTheme.headline6,
+            textAlign: TextAlign.center,
           ),
         ),
         Text(
           "Tap \"Done\" when done",
-          style: theme.textTheme.subtitle,
+          style: theme.textTheme.subtitle2,
+          textAlign: TextAlign.center,
         ),
         Flexible(
           child: ListView(
@@ -209,13 +212,20 @@ class _WordListState extends State<WordList> {
   }
 
   Widget _buildRow(String word) {
-    return ListTile(
-      title: Text(word),
-      leading: Checkbox(
-        value: _chosen.contains(word),
-        onChanged: (newValue) =>
-            setState(() => newValue ? _chosen.add(word) : _chosen.remove(word)),
+    return GestureDetector(
+      onTap: () => toggleOption(word),
+      child: ListTile(
+        title: Text(word),
+        leading: Checkbox(
+          value: _chosen.contains(word),
+          onChanged: (newValue) => toggleOption(word),
+        ),
       ),
     );
+  }
+
+  void toggleOption(String word) {
+    setState(() =>
+        _chosen.contains(word) ? _chosen.remove(word) : _chosen.add(word));
   }
 }

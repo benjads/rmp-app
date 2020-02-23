@@ -17,6 +17,7 @@ class StimulusView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Center(
         child: StimulusData(_participant, _stimuli, _onComplete),
       ),
@@ -92,11 +93,11 @@ class _StimulusDataState extends State<StimulusData> {
         children: <Widget>[
           Text(
             "Section Completed",
-            style: theme.textTheme.headline,
+            style: theme.textTheme.headline5,
           ),
           Text(
             "Please wait...",
-            style: theme.textTheme.subhead,
+            style: theme.textTheme.subtitle1,
           )
         ],
       );
@@ -108,14 +109,14 @@ class _StimulusDataState extends State<StimulusData> {
         children: <Widget>[
           Text(
             "Instructions:",
-            style: theme.textTheme.display2,
+            style: theme.textTheme.headline3,
           ),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 12.0),
             child: Text(
               "Several slides will be shown once you click \"Start\"." +
                   " Try to memorize them as best as you can.",
-              style: theme.textTheme.headline,
+              style: theme.textTheme.headline5,
               textAlign: TextAlign.center,
             ),
           ),
@@ -157,7 +158,7 @@ class _StimulusDataState extends State<StimulusData> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         SizedBox(
-          height: 400.0,
+          height: 200.0,
           width: double.infinity,
           child: Image(
             image: AssetImage(mnemonic
@@ -167,15 +168,17 @@ class _StimulusDataState extends State<StimulusData> {
         ),
         Text(
           _stimuli[_index].name,
-          style: theme.textTheme.headline
-              .copyWith(fontStyle: FontStyle.italic, fontSize: 40.0),
+          style: theme.textTheme.headline5
+              .copyWith(fontStyle: FontStyle.italic),
+          textAlign: TextAlign.center,
         ),
         if (mnemonic)
           Padding(
-            padding: EdgeInsets.only(top: 8.0),
+            padding: EdgeInsets.only(top: 15.0),
             child: Text(
               _stimuli[_index].mnemonicName,
-              style: theme.textTheme.headline.copyWith(fontSize: 40.0),
+              style: theme.textTheme.headline5,
+              textAlign: TextAlign.center,
             ),
           )
       ],

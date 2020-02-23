@@ -13,7 +13,7 @@ class Crate extends SpriteComponent {
   Crate(double x, this.maxY) : super.square(CRATE_SIZE, "crate.png") {
     this.angle = 0.0;
     this.x = x;
-    this.y = 200.0;
+    this.y = 150.0;
   }
 
   @override

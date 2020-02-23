@@ -7,6 +7,7 @@ class WaitView extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
+      appBar: AppBar(),
       body: SafeArea(
         child: Center(
           child: Column(
@@ -20,12 +21,12 @@ class WaitView extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 2.0),
                 child: Text(
                   "Latinmem Study",
-                  style: theme.textTheme.display2,
+                  style: theme.textTheme.headline3,
                 ),
               ),
               Text(
                 "University of California, Santa Cruz",
-                style: theme.textTheme.subhead,
+                style: theme.textTheme.subtitle1,
               ),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -36,7 +37,7 @@ class WaitView extends StatelessWidget {
               ),
               Text(
                 "Please wait for other participants",
-                style: theme.textTheme.subhead,
+                style: theme.textTheme.subtitle1,
               ),
               StreamBuilder(
                 stream: PackageInfo.fromPlatform().asStream(),

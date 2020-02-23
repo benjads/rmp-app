@@ -1,28 +1,37 @@
+import 'package:crossfire/crossfire.dart';
 import 'package:rmp_app/repo/common.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rmp_app/model/experiment.dart';
 
 class ExperimentRepo {
-  static final Firestore _firestore = Firestore.instance;
 
-  static Stream<DocumentSnapshot> getExperimentStream() {
-    return _firestore.document(FirestorePaths.experimentDocPath).snapshots();
+  final Firebase _firebase;
+  FirebaseDocumentReference _experimentRef;
+
+  ExperimentRepo(this._firebase);
+
+  Future<void> initialize() async {
+    _experimentRef = await _firebase.getDocument(FirestorePaths.experimentDocPath);
   }
 
-  static Future<DocumentSnapshot> getExperiment() {
-    return _firestore.document(FirestorePaths.experimentDocPath).get();
+  Future<Experiment> getExperiment() async {
+    final FirebaseDocument doc = await _experimentRef.document;
+    if (doc == null)
+      return null;
+
+    return Experiment.fromSnapshot(doc);
   }
 
-  static Future<DocumentSnapshot> createExperiment() async {
-    final DocumentReference docRef =
-        _firestore.document(FirestorePaths.experimentDocPath);
-    await docRef.setData(Experiment.defaultMap);
-    return docRef.get(source: Source.cache);
+  Stream<FirebaseDocument> getExperimentStream() {
+    return _experimentRef.onSnapshot;
   }
 
-  static Future<void> updateExperiment(Experiment experiment) async {
-    await _firestore
-        .document(FirestorePaths.experimentDocPath)
-        .updateData(experiment.map);
+  Future<Experiment> createExperiment() async {
+    await _experimentRef.setData(Experiment.defaultMap);
+    final FirebaseDocument doc =  await _experimentRef.document;
+    return Experiment.fromSnapshot(doc);
+  }
+
+  Future<void> updateExperiment(Experiment experiment) async {
+    _experimentRef.setData(experiment.map);
   }
 }

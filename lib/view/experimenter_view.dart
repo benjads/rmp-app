@@ -1,17 +1,18 @@
+import 'package:crossfire/crossfire.dart';
 import 'package:rmp_app/model/participant.dart';
-import 'package:rmp_app/repo/participant_repo.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:rmp_app/model/experiment.dart';
-import 'package:rmp_app/repo/experiment_repo.dart';
+import 'package:rmp_app/rmp_app.dart';
 import 'package:rmp_app/util.dart';
 
 class ExperimenterView extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
+      appBar: AppBar(),
       body: SafeArea(
         child: Center(
           child: Card(
@@ -19,28 +20,28 @@ class ExperimenterView extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10.0)),
             ),
-            child: StreamBuilder<DocumentSnapshot>(
-              stream: ExperimentRepo.getExperimentStream(),
+            child: StreamBuilder<FirebaseDocument>(
+              stream: RMPApp.experimentRepo.getExperimentStream(),
               builder: (context, experimentSnapshot) {
                 if (!experimentSnapshot.hasData)
                   return CircularProgressIndicator();
 
                 if (experimentSnapshot.data == null) {
-                  ExperimentRepo.createExperiment();
+                  RMPApp.experimentRepo.createExperiment();
                   return LinearProgressIndicator();
                 }
 
                 final Experiment experiment =
                     Experiment.fromSnapshot(experimentSnapshot.data);
 
-                return StreamBuilder<QuerySnapshot>(
-                  stream: ParticipantRepo.getParticipants(),
+                return StreamBuilder<Iterable<FirebaseDocument>>(
+                  stream: RMPApp.participantRepo.getParticipants(),
                   builder: (context, participantsSnapshot) {
                     if (!participantsSnapshot.hasData)
                       return CircularProgressIndicator();
 
                     final List<Participant> participants = [];
-                    participantsSnapshot.data.documents
+                    participantsSnapshot.data
                         .forEach((participantDoc) {
                       participants
                           .add(Participant.fromSnapshot(participantDoc));
@@ -52,7 +53,7 @@ class ExperimenterView extends StatelessWidget {
                         children: <Widget>[
                           Text(
                             "Experimenter Controls",
-                            style: theme.textTheme.title,
+                            style: theme.textTheme.headline6,
                           ),
                           ..._buildParticipantData(participants),
                           _buildDataRow(
@@ -201,30 +202,26 @@ class ExperimenterView extends StatelessWidget {
 
   void _changeState(Experiment experiment, ExperimentState state,
       List<Participant> participants) async {
-    final WriteBatch batch = Firestore.instance.batch();
     assert(participants != null);
 
     if (state == ExperimentState.RESET) {
-      ParticipantRepo.clearParticipants(participants, batch);
+      RMPApp.participantRepo.clearParticipants(participants);
 
       experiment.state = state;
-      batch.updateData(experiment.reference, experiment.map);
-      batch.commit();
+      RMPApp.experimentRepo.updateExperiment(experiment);
 
       Future.delayed(const Duration(seconds: 2), () {
         experiment.state = ExperimentState.WAIT;
-        ExperimentRepo.updateExperiment(experiment);
+        RMPApp.experimentRepo.updateExperiment(experiment);
       });
     } else {
       experiment.state = state;
-      ExperimentRepo.updateExperiment(experiment);
+      RMPApp.experimentRepo.updateExperiment(experiment);
 
       participants.forEach((participant) {
         participant.stageComplete = false;
-        participant.reference.updateData(participant.map);
+        RMPApp.participantRepo.updateParticipant(participant);
       });
-
-      batch.commit();
     }
   }
 }

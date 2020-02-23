@@ -1,21 +1,26 @@
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crossfire/crossfire.dart';
 import 'package:rmp_app/model/participant.dart';
 import 'package:rmp_app/repo/common.dart';
 import 'package:rmp_app/util.dart';
 
 class ParticipantRepo {
-  static final Firestore _firestore = Firestore.instance;
 
-  static Future<Participant> addParticipant() async {
+  final Firebase _firebase;
+  FirebaseCollection _participantCollection;
+
+  ParticipantRepo(this._firebase);
+
+  Future<void> initialize() async {
+    _participantCollection = await _firebase.getCollection(FirestorePaths.PARTICIPANTS_PATH);
+  }
+
+  Future<Participant> addParticipant() async {
     final String deviceId = await RMPUtil.getDeviceId();
 
-    final CollectionReference collectionRef =
-        _firestore.collection(FirestorePaths.PARTICIPANTS_PATH);
-    final QuerySnapshot collectionSnapshot = await collectionRef.getDocuments();
+    final Iterable<FirebaseDocument> collection = await _participantCollection.documents.first;
 
     num baselineCount = 0, mnemonicCount = 0;
-    for (var docSnapshot in collectionSnapshot.documents) {
+    for (var docSnapshot in collection) {
       final Participant curParticipant = Participant.fromSnapshot(docSnapshot);
 
       if (curParticipant.deviceId == deviceId)
@@ -35,30 +40,27 @@ class ParticipantRepo {
         mnemonicCount > baselineCount ? Condition.BASELINE : Condition.MNEMONIC;
     final Participant participant = Participant.initialize(deviceId, condition);
 
-    final DocumentReference docRef = await _firestore
-        .collection(FirestorePaths.PARTICIPANTS_PATH)
-        .add(participant.map);
+    final FirebaseDocumentReference docRef = await _participantCollection.add(participant.map);
 
     participant.reference = docRef;
     return participant;
   }
 
-  static Stream<QuerySnapshot> getParticipants() {
-    return _firestore.collection(FirestorePaths.PARTICIPANTS_PATH).snapshots();
+  Stream<Iterable<FirebaseDocument>> getParticipants() {
+    return _participantCollection.documents;
   }
 
-  static void clearParticipants(List<Participant> cached, WriteBatch batch) {
+  void clearParticipants(List<Participant> cached) {
     assert(cached != null);
-    assert(batch != null);
 
     for (final Participant participant in cached) {
-      final DocumentReference doc  = participant.reference;
-      assert(doc != null);
-      batch.delete(doc);
+      final FirebaseDocumentReference docRef  = participant.reference;
+      assert(docRef != null);
+      docRef.delete();
     }
   }
 
-  static Future<void> updateParticipant(Participant participant) async {
-    await participant.reference.updateData(participant.map);
+  Future<void> updateParticipant(Participant participant) async {
+    await participant.reference.update(participant.map);
   }
 }

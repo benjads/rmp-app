@@ -20,11 +20,24 @@ dependencies:
   flutter:
     sdk: flutter
 
-  firebase_core: ^0.4.3+1
-  cloud_firestore: ^0.13.0+1
+#  firebase_core: ^0.4.3+1
+#  cloud_firestore: ^0.13.0+1
+#  crossfire:
+#    git:
+#      url: git://github.com/apptreesoftware/crossfire.git
+#      path: crossfire
+  crossfire_flutter:
+    git:
+      url: git://github.com/apptreesoftware/crossfire.git
+      path: crossfire_flutter
+  crossfire_web:
+    git:
+      url: git://github.com/apptreesoftware/crossfire.git
+      path: crossfire_web
   device_info: ^0.4.1+4
   package_info: ^0.4.0+13
   flame: ^0.18.1
+  universal_html: ^1.1.13
 
 dev_dependencies:
   flutter_test:

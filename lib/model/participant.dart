@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crossfire/crossfire.dart';
 import 'package:rmp_app/util.dart';
 
 class Participant {
@@ -15,13 +15,13 @@ class Participant {
   num submitTime;
   final Condition condition;
   final Map<String, dynamic> survey;
-  DocumentReference reference;
+  FirebaseDocumentReference reference;
 
   Participant._internal(this.deviceId, this.stageComplete, this.percentCorrect,
       this.submitTime, this.condition, this.survey);
 
-  Participant.fromSnapshot(DocumentSnapshot snapshot)
-      : this.fromMap(snapshot.data, reference: snapshot.reference);
+  Participant.fromSnapshot(FirebaseDocument snapshot)
+      : this.fromMap(snapshot.data, reference: snapshot.ref);
 
   Participant.fromMap(Map<String, dynamic> map, {this.reference})
       : assert(map[DEVICE_ID] != null),
@@ -32,7 +32,7 @@ class Participant {
         assert(map[SURVEY] != null),
         deviceId = map[DEVICE_ID],
         stageComplete = map[STAGE_COMPLETE],
-        percentCorrect = map[PERCENT_CORRECT],
+        percentCorrect = double.parse(map[PERCENT_CORRECT].toString()),
         submitTime = map[SUBMIT_TIME],
         condition = Condition.values
             .firstWhere((state) => (state.toString() == map[CONDITION])),
