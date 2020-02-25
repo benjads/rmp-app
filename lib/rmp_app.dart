@@ -59,7 +59,7 @@ class LaunchView extends StatelessWidget {
       loadCommonData().whenComplete(() => Navigator.of(context).pushReplacement(
           new MaterialPageRoute(builder: (context) => ExperimenterView())));
     } else {
-      loadParticipantData().then((experiment) => Navigator.of(context)
+      loadParticipantData(context).then((experiment) => Navigator.of(context)
           .pushReplacement(new MaterialPageRoute(
               builder: (context) => ParticipantApp(experiment))));
     }
@@ -101,11 +101,13 @@ class LaunchView extends StatelessWidget {
     await _experimentRepo.initialize();
   }
 
-  Future<Experiment> loadParticipantData() async {
+  Future<Experiment> loadParticipantData(BuildContext context) async {
     await loadCommonData();
 
     await BoxGame.preload();
     _game = BoxGame();
+
+    await Stimulus.cache(context);
 
     final Participant participant = await _participantRepo.addParticipant();
     _participant = participant;

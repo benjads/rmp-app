@@ -17,9 +17,12 @@ class StimulusView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(),
-      body: Center(
-        child: StimulusData(_participant, _stimuli, _onComplete),
+      body: SafeArea(
+        child: Center(
+          child: StimulusData(_participant, _stimuli, _onComplete),
+        ),
       ),
     );
   }
@@ -81,6 +84,9 @@ class _StimulusDataState extends State<StimulusData> {
     super.dispose();
 
     if (_timer != null && _timer.isActive) _timer.cancel();
+    _index = 0;
+    _started = false;
+    _countdown = -1;
   }
 
   @override
@@ -158,26 +164,28 @@ class _StimulusDataState extends State<StimulusData> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         SizedBox(
-          height: 200.0,
+          height: 250.0,
           width: double.infinity,
           child: Image(
-            image: AssetImage(mnemonic
-                ? _stimuli[_index].mnemonicPath
-                : _stimuli[_index].standardPath),
-          ),
+              image: mnemonic
+                  ? _stimuli[_index].mnemonicImage
+                  : _stimuli[_index].standardImage),
         ),
-        Text(
-          _stimuli[_index].name,
-          style: theme.textTheme.headline5
-              .copyWith(fontStyle: FontStyle.italic),
-          textAlign: TextAlign.center,
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 10.0),
+          child: Text(
+            _stimuli[_index].name,
+            style:
+            theme.textTheme.headline4.copyWith(fontWeight: FontWeight.w700, color: Colors.black, fontStyle: FontStyle.italic),
+            textAlign: TextAlign.center,
+          ),
         ),
         if (mnemonic)
           Padding(
             padding: EdgeInsets.only(top: 15.0),
             child: Text(
               _stimuli[_index].mnemonicName,
-              style: theme.textTheme.headline5,
+              style: theme.textTheme.headline4.copyWith(fontWeight: FontWeight.w700, color: Colors.black),
               textAlign: TextAlign.center,
             ),
           )
