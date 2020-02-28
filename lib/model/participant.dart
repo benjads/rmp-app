@@ -39,7 +39,7 @@ class Participant {
         survey = RMPUtil.toMap(map[SURVEY]);
 
   factory Participant.initialize(String deviceId, Condition condition) {
-    return Participant._internal(deviceId, false, -1.0, -1, condition, {});
+    return Participant._internal(deviceId, false, -1.0, 0, condition, {});
   }
 
   Map<String, dynamic> get map {

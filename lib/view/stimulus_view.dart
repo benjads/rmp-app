@@ -113,12 +113,8 @@ class _StimulusDataState extends State<StimulusData> {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text(
-            "Instructions:",
-            style: theme.textTheme.headline3,
-          ),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 12.0),
+            padding: EdgeInsets.only(bottom: 20.0),
             child: Text(
               "Several slides will be shown once you click \"Start\"." +
                   " Try to memorize them as best as you can.",
