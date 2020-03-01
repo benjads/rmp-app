@@ -123,7 +123,7 @@ class _WordListState extends State<WordList> {
             padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 20.0),
             child: Text(
               "You will be shown several words once you click \"Start\"." +
-                  " Do your best to check the ones saw ealier."
+                  " Do your best to check the ones you saw ealier."
                       " You will have two minutes.",
               style: theme.textTheme.headline5,
               textAlign: TextAlign.center,

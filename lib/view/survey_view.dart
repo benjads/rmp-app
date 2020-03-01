@@ -102,36 +102,6 @@ class _QuestionContainerState extends State<QuestionContainer> {
         ),
       ],
     );
-//    return Column(
-//      mainAxisAlignment: MainAxisAlignment.center,
-//      mainAxisSize: MainAxisSize.min,
-//      children: <Widget>[
-//        Text(
-//          "Please answer the following questions",
-//          style: theme.textTheme.title,
-//        ),
-//        Text(
-//          "Tap \"Done\" when complete",
-//          style: theme.textTheme.subtitle,
-//        ),
-//        for (final SurveyQuestion question in SurveyQuestion.values)
-//          QuestionWidget(question, _participant, () {
-//            checkCompletion();
-//          }),
-//        ButtonBar(
-//          children: <Widget>[
-//            RaisedButton(
-//              onPressed: _complete
-//                  ? () => setState(() => _onComplete(_participant))
-//                  : null,
-//              child: Text("Done"),
-//              color: theme.accentColor,
-//              disabledColor: theme.disabledColor,
-//            ),
-//          ],
-//        ),
-//      ],
-//    );
   }
 
   void checkCompletion() {

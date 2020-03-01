@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:rmp_app/model/participant.dart';
 import 'package:rmp_app/model/stimulus.dart';
 
-const Duration STIMULUS_DISPLAY_TIME = const Duration(seconds: 3);
+const Duration STIMULUS_DISPLAY_TIME = const Duration(seconds: 7);
 const num COUNTDOWN_SECS = 3;
 
 class StimulusView extends StatelessWidget {
