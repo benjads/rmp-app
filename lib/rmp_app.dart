@@ -104,13 +104,13 @@ class LaunchView extends StatelessWidget {
   Future<Experiment> loadParticipantData(BuildContext context) async {
     await loadCommonData();
 
-    await BoxGame.preload();
-    _game = BoxGame();
-
     await Stimulus.cache(context);
 
     final Participant participant = await _participantRepo.addParticipant();
     _participant = participant;
+
+    await BoxGame.preload();
+    _game = BoxGame(participant);
 
     final Experiment experiment = await _experimentRepo.getExperiment();
     if (experiment == null)

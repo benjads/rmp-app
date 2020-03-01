@@ -5,7 +5,7 @@ import 'package:rmp_app/model/participant.dart';
 import 'package:rmp_app/model/stimulus.dart';
 
 const num COUNTDOWN_SECS = 3;
-const num TIMER_SECS = 10;
+const num TIMER_SECS = 120;
 const Duration SECOND = const Duration(seconds: 1);
 
 class TestView extends StatelessWidget {
@@ -53,7 +53,8 @@ class _WordListState extends State<WordList> {
   final List<String> _wordList = [];
   final List<String> _chosen = [];
 
-  bool _started = false;
+  bool _started = false, _showArrow = true;
+  ScrollController _scrollController;
   num _countdown = -1;
   Timer _timer;
 
@@ -70,6 +71,13 @@ class _WordListState extends State<WordList> {
 
       if (_countdown == 0) {
         _started = true;
+        _scrollController = ScrollController();
+        _scrollController.addListener(() {
+          if (_scrollController.offset > 0 && _showArrow)
+            setState(() {
+              _showArrow = false;
+            });
+        });
       } else {
         _timer = Timer(SECOND, decrementCountdown);
       }
@@ -78,9 +86,8 @@ class _WordListState extends State<WordList> {
 
   @override
   void dispose() {
-    super.dispose();
-
     if (_timer != null && _timer.isActive) _timer.cancel();
+    super.dispose();
   }
 
   @override
@@ -113,7 +120,7 @@ class _WordListState extends State<WordList> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(bottom: 20.0),
+            padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 20.0),
             child: Text(
               "You will be shown several words once you click \"Start\"." +
                   " Do your best to check the ones saw ealier."
@@ -167,15 +174,18 @@ class _WordListState extends State<WordList> {
           ),
         ),
         Text(
-          "Tap \"Done\" when done",
+          "Tap \"Done\" when complete",
           style: theme.textTheme.subtitle2,
           textAlign: TextAlign.center,
         ),
         Flexible(
-          child: ListView(
-            children: <Widget>[
-              for (final String word in _wordList) _buildRow(word)
-            ],
+          child: Scrollbar(
+            child: ListView(
+              children: <Widget>[
+                for (final String word in _wordList) _buildRow(word)
+              ],
+              controller: _scrollController,
+            ),
           ),
         ),
         Padding(
@@ -185,6 +195,7 @@ class _WordListState extends State<WordList> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               TimerDisplay(submit, _participant),
+              _showArrow ? Icon(Icons.arrow_downward) : Container(),
               ButtonBar(
                 children: <Widget>[
                   RaisedButton(
@@ -218,7 +229,10 @@ class _WordListState extends State<WordList> {
     return GestureDetector(
       onTap: () => toggleOption(word),
       child: ListTile(
-        title: Text(word),
+        title: Text(
+          word,
+          style: TextStyle(fontStyle: FontStyle.italic),
+        ),
         leading: Checkbox(
           value: _chosen.contains(word),
           onChanged: (newValue) => toggleOption(word),
@@ -259,9 +273,8 @@ class _TimerDisplayState extends State<TimerDisplay> {
 
   @override
   void dispose() {
-    super.dispose();
-
     if (_timer != null && _timer.isActive) _timer.cancel();
+    super.dispose();
   }
 
   @override
@@ -276,8 +289,7 @@ class _TimerDisplayState extends State<TimerDisplay> {
 
   void decrementTimer() {
     _participant.submitTime++;
-    if (_participant.submitTime >= TIMER_SECS)
-      _timerEnd();
+    if (_participant.submitTime >= TIMER_SECS) _timerEnd();
 
     setState(() {
       _timer = Timer(SECOND, decrementTimer);

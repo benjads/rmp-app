@@ -8,6 +8,7 @@ import 'package:flame/position.dart';
 import 'package:flame/text_config.dart';
 import 'package:flutter/material.dart';
 import 'package:rmp_app/game/game_components.dart';
+import 'package:rmp_app/model/participant.dart';
 
 // Game Credit: luanpotter of the Flame Engine dev team
 
@@ -17,11 +18,14 @@ class BoxGame extends BaseGame {
   static final TextConfig regularText = TextConfig(color: BasicPalette.white.color);
   static Size dimensions;
 
+  final Participant _participant;
   final List<Crate> crates = [];
   final List<Explosion> explosions = [];
 
-  double creationTimer = 0.0;
+  double goodCreationTimer = 0.0, badCreationTimer = 0.0;
   num points = 0;
+
+  BoxGame(this._participant);
 
   @override
   void render(Canvas canvas) {
@@ -49,18 +53,24 @@ class BoxGame extends BaseGame {
 
   @override
   void update(double t) {
-    creationTimer += t;
+    goodCreationTimer += t;
+    badCreationTimer += t;
 
-    if (creationTimer >= 0.6) {
-      creationTimer = 0.0;
-      newCrate();
+    if (goodCreationTimer >= 0.6) {
+      goodCreationTimer = 0.0;
+      newCrate(false);
+    }
+
+    if (badCreationTimer >= 2.0) {
+      badCreationTimer = 0.0;
+      newCrate(true);
     }
 
     crates.forEach((crate) => crate.update(t));
     crates.removeWhere((crate) {
       bool destroy = crate.destroy();
 
-      if (destroy)
+      if (destroy && !crate.badCrate)
         points -= 20;
 
       return destroy;
@@ -81,7 +91,7 @@ class BoxGame extends BaseGame {
       final bool remove = (dX < diff && dY < diff);
       if (remove) {
         explosions.add(new Explosion(crate));
-        points += 10;
+        points += crate.badCrate ? -30 : 10;
       }
 
       return remove;
@@ -91,14 +101,15 @@ class BoxGame extends BaseGame {
   @override
   void onDetach() {
     super.onDetach();
+    _participant.gameScore = points;
     points = 0;
     crates.clear();
     explosions.clear();
   }
 
-  void newCrate() {
+  void newCrate(bool badCrate) {
     final double x = (CRATE_SIZE / 2) + rnd.nextDouble() * (dimensions.width - CRATE_SIZE);
-    crates.add(Crate(x, dimensions.height));
+    crates.add(Crate(x, dimensions.height, badCrate));
   }
 
   static Future<void> preload() async {

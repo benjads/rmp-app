@@ -9,8 +9,10 @@ class Crate extends SpriteComponent {
   static const SPEED = 250.0;
 
   double maxY;
+  final bool badCrate;
 
-  Crate(double x, this.maxY) : super.square(CRATE_SIZE, "crate.png") {
+  Crate(double x, this.maxY, this.badCrate)
+      : super.square(CRATE_SIZE, badCrate ? "crate_bad.png" : "crate.png") {
     this.angle = 0.0;
     this.x = x;
     this.y = 150.0;
@@ -28,7 +30,6 @@ class Crate extends SpriteComponent {
 }
 
 class Explosion extends PositionComponent {
-
   static const TIME = 0.75;
 
   static final Paint paint = new Paint()..color = Color(0xffffffff);
@@ -52,7 +53,8 @@ class Explosion extends PositionComponent {
     final num i = (6 * lifetime / TIME).round();
     final Image image = images[i];
     assert(images.length > i && images[i] != null);
-    final Rect src = new Rect.fromLTWH(0.0, 0.0, image.width.toDouble(), image.height.toDouble());
+    final Rect src = new Rect.fromLTWH(
+        0.0, 0.0, image.width.toDouble(), image.height.toDouble());
     canvas.drawImageRect(image, src, src, paint);
   }
 
@@ -65,6 +67,4 @@ class Explosion extends PositionComponent {
   bool destroy() {
     return this.lifetime >= TIME;
   }
-
-
 }

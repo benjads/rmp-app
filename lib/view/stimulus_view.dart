@@ -33,7 +33,9 @@ class StimulusData extends StatefulWidget {
   final List<Stimulus> _stimuli;
   final Function _onComplete;
 
-  StimulusData(this._participant, this._stimuli, this._onComplete);
+  StimulusData(this._participant, this._stimuli, this._onComplete) {
+    _stimuli.shuffle();
+  }
 
   @override
   State<StatefulWidget> createState() =>
@@ -81,12 +83,12 @@ class _StimulusDataState extends State<StimulusData> {
 
   @override
   void dispose() {
-    super.dispose();
-
     if (_timer != null && _timer.isActive) _timer.cancel();
     _index = 0;
     _started = false;
     _countdown = -1;
+
+    super.dispose();
   }
 
   @override
@@ -114,7 +116,7 @@ class _StimulusDataState extends State<StimulusData> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(bottom: 20.0),
+            padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 20.0),
             child: Text(
               "Several slides will be shown once you click \"Start\"." +
                   " Try to memorize them as best as you can.",
@@ -163,6 +165,7 @@ class _StimulusDataState extends State<StimulusData> {
           height: 250.0,
           width: double.infinity,
           child: Image(
+              alignment: Alignment.center,
               image: mnemonic
                   ? _stimuli[_index].mnemonicImage
                   : _stimuli[_index].standardImage),
@@ -171,8 +174,10 @@ class _StimulusDataState extends State<StimulusData> {
           padding: EdgeInsets.symmetric(vertical: 10.0),
           child: Text(
             _stimuli[_index].name,
-            style:
-            theme.textTheme.headline4.copyWith(fontWeight: FontWeight.w700, color: Colors.black, fontStyle: FontStyle.italic),
+            style: theme.textTheme.headline4.copyWith(
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+                fontStyle: FontStyle.italic),
             textAlign: TextAlign.center,
           ),
         ),
@@ -181,7 +186,8 @@ class _StimulusDataState extends State<StimulusData> {
             padding: EdgeInsets.only(top: 15.0),
             child: Text(
               _stimuli[_index].mnemonicName,
-              style: theme.textTheme.headline4.copyWith(fontWeight: FontWeight.w700, color: Colors.black),
+              style: theme.textTheme.headline4
+                  .copyWith(fontWeight: FontWeight.w700, color: Colors.black),
               textAlign: TextAlign.center,
             ),
           )
